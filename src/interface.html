@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>AutoWabba</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #242424;
+        color: #f0f0f0;
+        overflow: hidden;
+        user-select: none;
+      }
+      .title-bar {
+        background-color: #1a1a1a;
+        height: 32px;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        -webkit-app-region: drag;
+      }
+      .title-bar-text {
+        color: #66aa66;
+        margin-left: 12px;
+        font-weight: bold;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .title-icon {
+        width: 16px;
+        height: 16px;
+      }
+      .title-bar-controls {
+        display: flex;
+        -webkit-app-region: no-drag;
+      }
+      .title-bar-button {
+        width: 46px;
+        height: 32px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        color: #aaa;
+      }
+      .title-bar-button:hover {
+        background-color: #333;
+      }
+      .title-bar-button.close:hover {
+        background-color: #e81123;
+        color: white;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      h1 {
+        color: #66aa66;
+        text-align: center;
+        margin-top: 10px;
+        font-size: 24px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      }
+      .controls {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+        gap: 15px;
+      }
+      button {
+        padding: 10px 25px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      }
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+      }
+      button:active {
+        transform: translateY(1px);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+      button:disabled:hover {
+        transform: none;
+        box-shadow: none;
+      }
+      .start-btn {
+        background-color: #4caf50;
+        color: white;
+      }
+      .stop-btn {
+        background-color: #f44336;
+        color: white;
+      }
+      .setup-btn {
+        background-color: #2196f3;
+        color: white;
+      }
+      .status {
+        text-align: center;
+        margin-bottom: 15px;
+        font-weight: bold;
+        padding: 5px;
+        border-radius: 4px;
+        background-color: #1a1a1a;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+      }
+      .log-container {
+        background-color: #1a1a1a;
+        border: 1px solid #444;
+        padding: 12px;
+        height: 250px;
+        overflow-y: auto;
+        border-radius: 6px;
+        box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.5);
+      }
+      .log-entry {
+        margin: 5px 0;
+        border-bottom: 1px dotted #444;
+        padding-bottom: 5px;
+        font-family: Consolas, monospace;
+        font-size: 13px;
+      }
+      .footer {
+        margin-top: 15px;
+        color: #888;
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .footer-content {
+        display: flex;
+        gap: 10px;
+      }
+      .github-link {
+        display: inline-flex;
+        align-items: center;
+        color: #66aa66;
+        text-decoration: none;
+        gap: 5px;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+      }
+      .github-link:hover {
+        background-color: #333;
+      }
+      .github-icon {
+        width: 20px;
+        height: 20px;
+        fill: #66aa66;
+      }
+      .help-link {
+        display: inline-flex;
+        align-items: center;
+        color: #6688aa;
+        text-decoration: none;
+        gap: 5px;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+      }
+      .help-link:hover {
+        background-color: #333;
+      }
+      .help-icon {
+        width: 20px;
+        height: 20px;
+        fill: #6688aa;
+      }
+      /* Modal styles */
+      .modal {
+        position: fixed;
+        z-index: 100;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-content {
+        background-color: #2a2a2a;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #555;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 500px;
+        max-height: 80vh;
+        overflow-y: auto;
+        position: relative;
+        color: #f0f0f0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      }
+      .modal-close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      .modal-close:hover,
+      .modal-close:focus {
+        color: #66aa66;
+        text-decoration: none;
+      }
+      .modal-content h2 {
+        color: #66aa66;
+        margin-top: 0;
+        border-bottom: 1px solid #444;
+        padding-bottom: 10px;
+      }
+      .modal-content p {
+        margin: 12px 0;
+      }
+      .modal-content ul,
+      .modal-content ol {
+        margin-top: 5px;
+        margin-bottom: 15px;
+        padding-left: 25px;
+      }
+      .modal-content li {
+        margin-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="title-bar">
+      <div class="title-bar-text">
+        <img
+          src="../icon.png"
+          class="title-icon"
+          alt="AutoWabba Icon"
+        />
+        AutoWabba
+      </div>
+      <div class="title-bar-controls">
+        <div
+          class="title-bar-button minimize"
+          id="minimizeBtn"
+        >
+          &#x2212;
+        </div>
+        <div
+          class="title-bar-button close"
+          id="closeBtn"
+        >
+          &#x2715;
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div
+        class="status"
+        id="status"
+      >
+        Status: Ready
+      </div>
+      <div class="controls">
+        <button
+          class="setup-btn"
+          id="setupBtn"
+        >
+          Setup Browser
+        </button>
+        <button
+          class="start-btn"
+          id="startBtn"
+          disabled
+        >
+          Start
+        </button>
+        <button
+          class="stop-btn"
+          id="stopBtn"
+          disabled
+        >
+          Stop
+        </button>
+      </div>
+      <h3>Activity Log:</h3>
+      <div
+        class="log-container"
+        id="logContainer"
+      ></div>
+      <div class="footer">
+        <div class="footer-content">
+          <a
+            href="#"
+            class="help-link"
+            id="helpLink"
+          >
+            <svg
+              class="help-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z"
+              />
+            </svg>
+            Help?
+          </a>
+        </div>
+        <div class="footer-content">
+          <a
+            href="https://github.com/LucasHenriqueDiniz/AutoWabba"
+            class="github-link"
+            id="githubLink"
+          >
+            <svg
+              class="github-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+              />
+            </svg>
+            GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+    <script>
+      const { ipcRenderer, remote } = require("electron");
+
+      const minimizeBtn = document.getElementById("minimizeBtn");
+      const closeBtn = document.getElementById("closeBtn");
+      const setupBtn = document.getElementById("setupBtn");
+      const startBtn = document.getElementById("startBtn");
+      const stopBtn = document.getElementById("stopBtn");
+      const statusElem = document.getElementById("status");
+      const logContainer = document.getElementById("logContainer");
+      const githubLink = document.getElementById("githubLink");      // Check browser status when application starts
+      window.addEventListener("DOMContentLoaded", () => {
+        ipcRenderer.send("check-browser");
+      });
+
+      function addLogMessage(message) {
+        const entry = document.createElement("div");
+        entry.className = "log-entry";
+        entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        logContainer.appendChild(entry);
+        logContainer.scrollTop = logContainer.scrollHeight;
+      }
+      setupBtn.addEventListener("click", () => {
+        addLogMessage("Setting up browser...");
+        ipcRenderer.send("setup-browser");
+      });
+      startBtn.addEventListener("click", () => {
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        ipcRenderer.send("start-automation");
+      });
+
+      stopBtn.addEventListener("click", () => {
+        stopBtn.disabled = true;
+        ipcRenderer.send("stop-automation");
+      });
+
+      ipcRenderer.on("log-message", (event, message) => {
+        addLogMessage(message);
+      });
+
+      ipcRenderer.on("status-update", (event, status) => {
+        if (status === "running") {
+          statusElem.textContent = "Status: Running";
+          statusElem.style.color = "#4CAF50";
+        } else if (status === "stopped") {
+          statusElem.textContent = "Status: Stopped";
+          statusElem.style.color = "#f44336";
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+        }
+      });
+      ipcRenderer.on("setup-complete", () => {
+        addLogMessage("Browser setup complete! You can now open Wabbajack and start the automation.");
+        // Check again if browser is available
+        setTimeout(() => {
+          ipcRenderer.send("check-browser");
+        }, 1000);
+      });
+
+      ipcRenderer.on("browser-status", (event, status) => {
+        if (status === "available") {
+          startBtn.disabled = false;
+          addLogMessage("Wabbajack detected! Ready to start.");
+        } else if (status === "unavailable") {
+          startBtn.disabled = true;
+          addLogMessage("Wabbajack not found. Set up the browser and open Wabbajack.");
+        } else if (status === "error") {
+          startBtn.disabled = true;
+        }
+      });      // Title bar button events
+      minimizeBtn.addEventListener("click", () => {
+        ipcRenderer.send("minimize-window");
+      });
+
+      closeBtn.addEventListener("click", () => {
+        ipcRenderer.send("close-window");
+      });
+
+      // Open GitHub in browser
+      githubLink.addEventListener("click", (event) => {
+        event.preventDefault();
+        ipcRenderer.send("open-github");
+      }); // Add event listener for the Help button
+      helpLink.addEventListener("click", () => {
+        showHelpDialog();
+      });
+
+      function showHelpDialog() {
+        // Create modal elements
+        const modal = document.createElement("div");
+        modal.className = "modal";
+
+        const modalContent = document.createElement("div");
+        modalContent.className = "modal-content";
+
+        const closeBtn = document.createElement("span");
+        closeBtn.className = "modal-close";
+        closeBtn.innerHTML = "&times;";
+
+        const title = document.createElement("h2");
+        title.textContent = "AutoWabba Help";
+
+        const content = document.createElement("div");
+        content.innerHTML = `
+          <p><strong>What is AutoWabba?</strong></p>
+          <p>AutoWabba is a tool that helps automate downloads from Nexus Mods when using Wabbajack mod lists.</p>
+          
+          <p><strong>How to use:</strong></p>
+          <ol>
+            <li>Click "Setup Browser" to prepare your browser for automation</li>
+            <li>Open Wabbajack and start installing your mod list</li>
+            <li>Click "Start" to begin the automation</li>
+            <li>The tool will automatically download files when prompted by Wabbajack</li>
+            <li>Click "Stop" when you're done</li>
+          </ol>
+          
+          <p><strong>Troubleshooting:</strong></p>
+          <ul>
+            <li>If the automation doesn't start, make sure Wabbajack is open</li>
+            <li>Try running "Setup Browser" again if downloads aren't being recognized</li>
+            <li>Make sure you're logged into your Nexus account in the browser</li>
+          </ul>
+        `;
+
+        // Assemble modal
+        modalContent.appendChild(closeBtn);
+        modalContent.appendChild(title);
+        modalContent.appendChild(content);
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+
+        // Add close functionality
+        closeBtn.addEventListener("click", () => {
+          document.body.removeChild(modal);
+        });
+
+        window.addEventListener("click", (event) => {
+          if (event.target === modal) {
+            document.body.removeChild(modal);
+          }
+        });
+      }
+
+      addLogMessage("Application started");
+    </script>
+  </body>
+</html>

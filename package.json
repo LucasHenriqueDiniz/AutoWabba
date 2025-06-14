@@ -1,0 +1,52 @@
+{
+  "name": "auto-wabba",
+  "version": "1.0.0",
+  "description": "Automatic downloader for Wabbajack mod lists from Nexus Mods",
+  "main": "main.js",
+  "author": "Lucas Henrique Diniz",
+  "license": "MIT",
+  "homepage": "https://github.com/LucasHenriqueDiniz/AutoWabba",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LucasHenriqueDiniz/AutoWabba.git"
+  },
+  "keywords": [
+    "wabbajack",
+    "modding",
+    "downloader",
+    "automation"
+  ],
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win portable"
+  },
+  "dependencies": {
+    "playwright": "^1.42.1"
+  },
+  "devDependencies": {
+    "electron": "^30.5.1",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.lucashenriquedini.autowabba",
+    "productName": "AutoWabba",
+    "files": [
+      "**/*",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/node_modules/*.d.ts",
+      "!**/node_modules/.bin",
+      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+      "!.editorconfig",
+      "!**/._*",
+      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+      "!**/{appveyor.yml,.travis.yml,circle.yml}",
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+    ],
+    "win": {
+      "target": "portable",
+      "icon": "icon.png"
+    }
+  }
+}
