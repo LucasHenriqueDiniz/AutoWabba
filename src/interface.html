@@ -370,6 +370,7 @@
       });
       startBtn.addEventListener("click", () => {
         startBtn.disabled = true;
+        setupBtn.disabled = true;
         stopBtn.disabled = false;
         ipcRenderer.send("start-automation");
       });
@@ -382,7 +383,6 @@
       ipcRenderer.on("log-message", (event, message) => {
         addLogMessage(message);
       });
-
       ipcRenderer.on("status-update", (event, status) => {
         if (status === "running") {
           statusElem.textContent = "Status: Running";
@@ -391,6 +391,7 @@
           statusElem.textContent = "Status: Stopped";
           statusElem.style.color = "#f44336";
           startBtn.disabled = false;
+          setupBtn.disabled = false;
           stopBtn.disabled = true;
         }
       });
@@ -402,13 +403,22 @@
         }, 1000);
       });
 
+      let previousBrowserStatus = null;
       ipcRenderer.on("browser-status", (event, status) => {
+        // Only show log messages when the status changes
+        const statusChanged = status !== previousBrowserStatus;
+        previousBrowserStatus = status;
+
         if (status === "available") {
           startBtn.disabled = false;
-          addLogMessage("Wabbajack detected! Ready to start.");
+          if (statusChanged) {
+            addLogMessage("Wabbajack detected! Ready to start.");
+          }
         } else if (status === "unavailable") {
           startBtn.disabled = true;
-          addLogMessage("Wabbajack not found. Set up the browser and open Wabbajack.");
+          if (statusChanged) {
+            addLogMessage("Wabbajack not found. Set up the browser and open Wabbajack.");
+          }
         } else if (status === "error") {
           startBtn.disabled = true;
         }

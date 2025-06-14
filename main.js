@@ -90,31 +90,42 @@ ipcMain.on("start-automation", async (event) => {
   stopRequested = false;
   event.reply("status-update", "running");
   event.reply("log-message", "Starting download automation...");
-
   let lastClickedUrl = null;
+  let attempts = 0;
+  const MAX_ATTEMPTS = 10;
   const COOLDOWN_TIME = 6000;
+  let lastBrowserStatus = null;
   while (isRunning && !stopRequested) {
     try {
       const pages = await checkBrowserAvailability();
-      // Enviar status do navegador para atualizar estado dos botões
-      if (!pages) {
-        event.reply("browser-status", "unavailable");
-      } else {
-        event.reply("browser-status", "available");
-      }
-      if (!pages) {
-        event.reply("log-message", "Browser not found. Make sure Wabbajack is open.");
-        await new Promise((r) => setTimeout(r, 5000));
-        continue;
+      // Update browser status to update button state, but only send log message if status changed
+      const currentStatus = pages ? "available" : "unavailable";
+      if (currentStatus !== lastBrowserStatus) {
+        lastBrowserStatus = currentStatus;
+        event.reply("browser-status", currentStatus);
+        if (!pages) {
+          event.reply("log-message", "Browser not found. Make sure Wabbajack is open.");
+          await new Promise((r) => setTimeout(r, 5000));
+          continue;
+        }
       }
 
       const targetPage = await findTargetPage(pages);
 
       if (targetPage) {
         if (lastClickedUrl === targetPage.url) {
-          event.reply("log-message", "Download still in progress... Waiting for completion");
-          await new Promise((r) => setTimeout(r, 2000));
-          continue;
+          attempts++;
+          if (attempts >= MAX_ATTEMPTS) {
+            event.reply("log-message", "Download seems stuck. Resetting and trying again...");
+            lastClickedUrl = null;
+            attempts = 0;
+          } else {
+            event.reply("log-message", "Download still in progress... Waiting for completion");
+            await new Promise((r) => setTimeout(r, 2000));
+            continue;
+          }
+        } else {
+          attempts = 0;
         }
 
         event.reply("log-message", "Download page found! Starting download...");
@@ -123,6 +134,7 @@ ipcMain.on("start-automation", async (event) => {
 
         if (clickResult) {
           lastClickedUrl = clickResult;
+          attempts = 0; // Reset attempts when download starts
           event.reply("log-message", `Download started! Waiting ${COOLDOWN_TIME / 1000}s...`);
           await browser.close();
           await new Promise((r) => setTimeout(r, COOLDOWN_TIME));

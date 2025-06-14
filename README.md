@@ -1,8 +1,22 @@
+<div align="center">
+  
 # AutoWabba
 
-![AutoWabba](./icon.png)
+![Banner](./banner.jpg)
 
-Automatically download mods from Nexus Mods when using Wabbajack mod lists. This tool makes the installation process of large modpacks completely automated by handling the download interaction.
+### Automatic download helper for Wabbajack mod lists from Nexus Mods
+
+[![GitHub release](https://img.shields.io/github/v/release/LucasHenriqueDiniz/AutoWabba?include_prereleases&style=flat-square)](https://github.com/LucasHenriqueDiniz/AutoWabba/releases/latest)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Downloads](https://img.shields.io/github/downloads/LucasHenriqueDiniz/AutoWabba/total?style=flat-square)](https://github.com/LucasHenriqueDiniz/AutoWabba/releases)
+
+### [⬇️ Download Latest Version ⬇️](https://github.com/LucasHenriqueDiniz/AutoWabba/releases/latest)
+
+</div>
+
+AutoWabba makes the installation process of large modpacks completely automated by handling the download interaction with Nexus Mods.
+
+![App Showcase](./app_showcase.png)
 
 **Note**: Currently only works with Nexus Mods downloads.
 
@@ -21,9 +35,9 @@ Automatically download mods from Nexus Mods when using Wabbajack mod lists. This
 - Microsoft Edge or Edge WebView2 Runtime
 - Nexus Mods account (must be logged in within Wabbajack)
 
-## Download
+## Installation
 
-1. Download the latest release from [GitHub Releases](https://github.com/LucasHenriqueDiniz/AutoWabba/releases)
+1. Download the latest release from the download button above
 2. Extract the ZIP file to a location of your choice
 
 ## Usage
@@ -37,12 +51,14 @@ Automatically download mods from Nexus Mods when using Wabbajack mod lists. This
 
 ## How It Works
 
-AutoWabba connects to Wabbajack's browser component and:
+AutoWabba automates the download process using these technical steps:
 
-1. Monitors for Nexus Mods download pages
-2. Automatically clicks the "Slow Download" button when detected
-3. Waits for the download to complete before proceeding to the next download
-4. Handles the entire queue of downloads for your modpack
+1. Opens debugging port 9222 on Microsoft Edge (used by Wabbajack)
+2. Connects to this port using the Chrome DevTools Protocol (CDP)
+3. Monitors for Nexus Mods download pages in active browser tabs
+4. Uses JavaScript to automatically click the "Slow Download" button when detected
+5. Waits for the download to complete before proceeding to the next file
+6. Repeats this process for the entire queue of downloads in your modpack
 
 ## Troubleshooting
 
@@ -51,6 +67,9 @@ AutoWabba connects to Wabbajack's browser component and:
 | "Browser not found" error    | Make sure you clicked "Setup Browser" and Wabbajack is open |
 | Downloads not being detected | Try restarting both AutoWabba and Wabbajack                 |
 | Button clicks not working    | Make sure you're logged into your Nexus Mods account        |
+| Downloads getting stuck      | AutoWabba will automatically retry after 10 attempts        |
+| Edge not detected            | Make sure Edge WebView2 Runtime is installed                |
+| Application not responding   | Try running AutoWabba as administrator                      |
 
 ## Building from Source
 
@@ -68,3 +87,13 @@ MIT License - See [LICENSE](LICENSE) file for details
 ## Author
 
 Created by [Lucas Henrique Diniz](https://github.com/LucasHenriqueDiniz)
+
+---
+
+<div align="center">
+
+If you find this tool useful, consider giving it a star on GitHub!
+
+[Report Issues](https://github.com/LucasHenriqueDiniz/AutoWabba/issues) | [Contribute](https://github.com/LucasHenriqueDiniz/AutoWabba/pulls)
+
+</div>

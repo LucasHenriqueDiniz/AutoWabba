@@ -6,7 +6,7 @@ on:
       - "v*"
 
 permissions:
-  contents: write  # Explicit permission to create releases
+  contents: write # Explicit permission to create releases
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Required for full tag history
+          fetch-depth: 0 # Required for full tag history
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -26,13 +26,13 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Build
         run: npm run build
-        
+
       - name: List build output
         run: dir dist
-        
+
       - name: Create Release and Upload Assets
         uses: softprops/action-gh-release@v1
         with:
