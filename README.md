@@ -46,11 +46,11 @@ AutoWabba connects to Wabbajack's browser component and:
 
 ## Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| "Browser not found" error | Make sure you clicked "Setup Browser" and Wabbajack is open |
-| Downloads not being detected | Try restarting both AutoWabba and Wabbajack |
-| Button clicks not working | Make sure you're logged into your Nexus Mods account |
+| Issue                        | Solution                                                    |
+| ---------------------------- | ----------------------------------------------------------- |
+| "Browser not found" error    | Make sure you clicked "Setup Browser" and Wabbajack is open |
+| Downloads not being detected | Try restarting both AutoWabba and Wabbajack                 |
+| Button clicks not working    | Make sure you're logged into your Nexus Mods account        |
 
 ## Building from Source
 

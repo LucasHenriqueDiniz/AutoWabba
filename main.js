@@ -1,9 +1,9 @@
 /**
  * AutoWabba - Automatic Download Helper for Wabbajack
- * 
+ *
  * This application automates the process of downloading mods from Nexus Mods
  * when using Wabbajack mod lists by automatically clicking download buttons.
- * 
+ *
  * @author Lucas Henrique Diniz
  * @license MIT
  */
@@ -31,7 +31,7 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
     },
-    frame: false, // Use custom window frame
+    frame: false,
     resizable: false,
     transparent: false,
     autoHideMenuBar: true,
@@ -196,5 +196,3 @@ ipcMain.on("check-browser", async (event) => {
     event.reply("browser-status", "error");
   }
 });
-
-// This duplicate handler can be removed as we already have a check-browser handler above

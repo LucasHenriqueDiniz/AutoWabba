@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder --win portable"
+    "build": "electron-builder --win portable --publish never"
   },
   "dependencies": {
     "playwright": "^1.42.1"
@@ -47,6 +47,12 @@
     "win": {
       "target": "portable",
       "icon": "icon.png"
+    },
+    "directories": {
+      "output": "dist"
+    },
+    "portable": {
+      "artifactName": "AutoWabba.exe"
     }
   }
 }

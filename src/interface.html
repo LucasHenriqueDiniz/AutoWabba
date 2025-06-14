@@ -352,7 +352,7 @@
       const stopBtn = document.getElementById("stopBtn");
       const statusElem = document.getElementById("status");
       const logContainer = document.getElementById("logContainer");
-      const githubLink = document.getElementById("githubLink");      // Check browser status when application starts
+      const githubLink = document.getElementById("githubLink"); // Check browser status when application starts
       window.addEventListener("DOMContentLoaded", () => {
         ipcRenderer.send("check-browser");
       });
@@ -412,7 +412,7 @@
         } else if (status === "error") {
           startBtn.disabled = true;
         }
-      });      // Title bar button events
+      }); // Title bar button events
       minimizeBtn.addEventListener("click", () => {
         ipcRenderer.send("minimize-window");
       });

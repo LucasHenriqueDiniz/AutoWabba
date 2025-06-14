@@ -1,0 +1,13 @@
+@echo off
+echo Cleaning up legacy files...
+
+echo Deleting src/index.js...
+del "src\index.js"
+
+echo Deleting src/ui.js...
+del "src\ui.js"
+
+echo Deleting setup.bat...
+del "setup.bat"
+
+echo Legacy cleanup complete!
