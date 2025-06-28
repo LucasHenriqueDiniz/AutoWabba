@@ -24,8 +24,9 @@ AutoWabba automates the process of downloading mods from Nexus Mods when using W
 ## Installation
 
 1. Download the latest release from the [Releases page](https://github.com/LucasHenriqueDiniz/AutoWabba/releases)
-2. Extract the files to a folder
-3. Run `AutoWabba.exe`
+2. Run `AutoWabba.exe`
+
+> **Note:** Windows Defender or other antivirus software may flag this program as a virus. This is a false positive due to the automation and packaging methods used. In the future, we plan to add a code signing certificate to further reduce these warnings. You can check the [VirusTotal scan here](https://www.virustotal.com/gui/file/494c6e157d1280abc9d78e2874efd112ac3b97877492b38f9d0dd46887947570/behavior). The full source code is available on GitHub for your review.
 
 ## Usage
 
@@ -33,6 +34,8 @@ AutoWabba automates the process of downloading mods from Nexus Mods when using W
 2. **Start Automation**: Click "Start" to launch Wabbajack with debug mode and begin automation
 3. **Monitor Status**: Watch the status bar for current status
 4. **Stop When Done**: Click "Stop" to end the automation
+
+> **Note:** You may be asked to log in to Nexus Mods again, as AutoWabba creates a modified browser instance for automation.
 
 ## How It Works
 
@@ -45,6 +48,10 @@ The tool includes robust error handling:
 - **Download Stuck**: Automatically retries after 10 attempts
 - **Error Pages**: Detects and waits for recovery
 - **Browser Issues**: Monitors for multiple error pages and waits longer
+
+## Planning
+
+- [ ] Add code signing certificate to future releases to further reduce false positives from antivirus software.
 
 ## Development
 
