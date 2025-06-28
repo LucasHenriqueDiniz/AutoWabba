@@ -28,6 +28,13 @@ AutoWabba automates the process of downloading mods from Nexus Mods when using W
 
 > **Note:** Windows Defender or other antivirus software may flag this program as a virus. This is a false positive due to the automation and packaging methods used. In the future, we plan to add a code signing certificate to further reduce these warnings. You can check the [VirusTotal scan here](https://www.virustotal.com/gui/file/494c6e157d1280abc9d78e2874efd112ac3b97877492b38f9d0dd46887947570/behavior). The full source code is available on GitHub for your review.
 
+## ⚠️ Known Issues
+
+Please be aware that there are still some **minor issues** during use. See the [Known Issues](https://github.com/LucasHenriqueDiniz/AutoWabba/issues) page for updates.
+
+- Sometimes Nexus Mods detects "suspicious behavior" and logs the user out, which causes the download to stall until you log in again.
+- Occasionally, the mod download page may close unexpectedly — usually related to the logout issue — and may require manual intervention (just close the tab and wabbajack will reopen).
+
 ## Status Bar Meanings
 
 The status bar at the bottom of the app shows what AutoWabba is doing:
@@ -48,8 +55,6 @@ The status bar at the bottom of the app shows what AutoWabba is doing:
 6. **Login to Nexus Mods if Needed**: If prompted, log in to your Nexus Mods account. (Note: You may need to log in again because AutoWabba uses a separate Edge/Chromium instance for automation.)
 7. **Let AutoWabba Work**: The status bar will update as downloads are processed. You can monitor progress and stop automation at any time by clicking "Stop".
 
-> **Note:** You may be asked to log in to Nexus Mods again, as AutoWabba creates a modified browser instance for automation.
-
 ## How It Works
 
 AutoWabba uses Chrome DevTools Protocol to connect to Wabbajack's embedded browser (WebView2) and automatically clicks download buttons when Wabbajack opens Nexus Mods pages.
@@ -65,6 +70,7 @@ The tool includes robust error handling:
 ## Planning
 
 - [ ] Add code signing certificate to future releases to further reduce false positives from antivirus software.
+- [ ] May add a refresh login or smething
 
 ## Development
 
