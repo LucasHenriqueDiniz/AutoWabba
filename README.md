@@ -16,7 +16,11 @@
 
 AutoWabba makes the installation process of large modpacks completely automated by handling the download interaction with Nexus Mods.
 
+<div align="center">
+  
 ![App Showcase](./app_showcase.png)
+
+</div>
 
 **Note**: Currently only works with Nexus Mods downloads.
 
