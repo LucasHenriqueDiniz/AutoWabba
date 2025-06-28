@@ -32,6 +32,11 @@
     "productName": "AutoWabba",
     "files": [
       "**/*",
+      "!Testes{,/**}",
+      "!dist{,/**}",
+      "!.github{,/**}",
+      "!4.0.2.0{,/**}",
+      "!4.0.1.0{,/**}",
       "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
       "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
       "!**/node_modules/*.d.ts",
@@ -42,7 +47,13 @@
       "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
       "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
       "!**/{appveyor.yml,.travis.yml,circle.yml}",
-      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
+      "!tests{,/**}",
+      "!LICENSE",
+      "!.gitignore",
+      "!package.json",
+      "!package-lock.json",
+      "!README.md"
     ],
     "win": {
       "target": "portable",
@@ -53,6 +64,9 @@
     },
     "portable": {
       "artifactName": "AutoWabba.exe"
-    }
+    },
+    "compression": "maximum",
+    "removePackageScripts": true,
+    "removePackageKeywords": true
   }
 }

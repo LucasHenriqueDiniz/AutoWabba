@@ -28,12 +28,25 @@ AutoWabba automates the process of downloading mods from Nexus Mods when using W
 
 > **Note:** Windows Defender or other antivirus software may flag this program as a virus. This is a false positive due to the automation and packaging methods used. In the future, we plan to add a code signing certificate to further reduce these warnings. You can check the [VirusTotal scan here](https://www.virustotal.com/gui/file/494c6e157d1280abc9d78e2874efd112ac3b97877492b38f9d0dd46887947570/behavior). The full source code is available on GitHub for your review.
 
+## Status Bar Meanings
+
+The status bar at the bottom of the app shows what AutoWabba is doing:
+
+- **Ready to start Wabbajack**: The app is ready. Select your Wabbajack.exe and click Start.
+- **Starting...**: Wabbajack is being launched or detected.
+- **Waiting for browser... (X)**: Wabbajack is running, but no mod download page is open yet. Open a modlist and proceed until Wabbajack starts opening Nexus Mods pages. (X = number of downloads so far)
+- **Running - Automation active (X)**: AutoWabba is actively monitoring and clicking download buttons. (X = number of downloads so far)
+- **Stopped (Total: X)**: Automation has stopped. X is the total number of downloads AutoWabba clicked during this session.
+
 ## Usage
 
-1. **Select Wabbajack**: Click the edit icon next to the path to select your Wabbajack.exe
-2. **Start Automation**: Click "Start" to launch Wabbajack with debug mode and begin automation
-3. **Monitor Status**: Watch the status bar for current status
-4. **Stop When Done**: Click "Stop" to end the automation
+1. **Open AutoWabba**: Start the app by running `AutoWabba.exe`.
+2. **Select Wabbajack**: Click the edit icon next to the path to select your `Wabbajack.exe` (only needed the first time).
+3. **Start Wabbajack via AutoWabba**: Click "Start" in AutoWabba. This will launch Wabbajack in debug mode, ready for automation.
+4. **Select Your Modlist**: In Wabbajack, choose the modlist you want to install, select the install location, and proceed as usual.
+5. **Proceed to Download Phase**: Continue in Wabbajack until it starts opening browser pages for Nexus Mods downloads. AutoWabba will detect these pages and begin clicking download buttons automatically.
+6. **Login to Nexus Mods if Needed**: If prompted, log in to your Nexus Mods account. (Note: You may need to log in again because AutoWabba uses a separate Edge/Chromium instance for automation.)
+7. **Let AutoWabba Work**: The status bar will update as downloads are processed. You can monitor progress and stop automation at any time by clicking "Stop".
 
 > **Note:** You may be asked to log in to Nexus Mods again, as AutoWabba creates a modified browser instance for automation.
 

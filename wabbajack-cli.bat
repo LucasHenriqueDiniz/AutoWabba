@@ -1,1 +1,0 @@
-"C:\Users\lucas\Documents\GitHub\ahk-wabbajack-autodownload\4.0.2.0\cli\wabbajack-cli.exe" %*

@@ -299,19 +299,23 @@
         stopBtn.disabled = true;
       });
 
-      ipcRenderer.on("status-update", (event, status) => {
+      ipcRenderer.on("status-update", (event, data) => {
+        const status = typeof data === "string" ? data : data.status;
+        const downloadCounter = data.downloadCounter || 0;
         if (status === "running") {
-          statusBar.textContent = "Running - Automation active";
+          statusBar.textContent = `Running - Automation active (${downloadCounter})`;
           statusBar.style.color = "#4CAF50";
-        } else if (status === "stopped") {
-          statusBar.textContent = "Stopped";
-          statusBar.style.color = "#f44336";
-          startBtn.disabled = false;
-          stopBtn.disabled = true;
-        } else if (status === "wabbajack_running") {
-          statusBar.textContent = "Close Wabbajack before continuing, let the app open it";
+          startBtn.disabled = true;
+          stopBtn.disabled = false;
+        } else if (status === "waiting_browser") {
+          statusBar.textContent = `Waiting for browser... (${downloadCounter})`;
           statusBar.style.color = "#ff9800";
           startBtn.disabled = true;
+          stopBtn.disabled = false;
+        } else if (status === "stopped") {
+          statusBar.textContent = `Stopped (Total: ${downloadCounter})`;
+          statusBar.style.color = "#f44336";
+          startBtn.disabled = false;
           stopBtn.disabled = true;
         } else if (status === "ready") {
           statusBar.textContent = "Ready to start Wabbajack";

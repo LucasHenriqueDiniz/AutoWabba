@@ -3,8 +3,23 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 
+// Get the directory where the executable is located
+function getExecutableDir() {
+  // Check if we're in development mode
+  const isDev =
+    process.env.NODE_ENV === "development" || process.env.ELECTRON_IS_DEV || process.execPath.includes("node.exe") || process.execPath.includes("electron.exe");
+
+  if (isDev) {
+    // In development, use current directory
+    return process.cwd();
+  }
+
+  // In production (packaged app), use the directory where the .exe is located
+  return path.dirname(process.execPath);
+}
+
 // Configuration file to store the Wabbajack path
-const configFilePath = path.join(process.cwd(), "wabbajack-config.json");
+const configFilePath = path.join(getExecutableDir(), "wabbajack-config.json");
 
 /**
  * Check if Wabbajack is running
@@ -41,6 +56,11 @@ function saveWabbajackPath(wabbajackPath) {
       wabbajackPath: wabbajackPath,
       lastUpdated: new Date().toISOString(),
     };
+
+    console.log(`Saving config to: ${configFilePath}`);
+    console.log(`Executable dir: ${getExecutableDir()}`);
+    console.log(`Current working dir: ${process.cwd()}`);
+
     fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2));
     console.log(`Wabbajack path saved: ${wabbajackPath}`);
   } catch (error) {
@@ -54,6 +74,10 @@ function saveWabbajackPath(wabbajackPath) {
  */
 function loadWabbajackPath() {
   try {
+    console.log(`Looking for config at: ${configFilePath}`);
+    console.log(`Executable dir: ${getExecutableDir()}`);
+    console.log(`Current working dir: ${process.cwd()}`);
+
     if (fs.existsSync(configFilePath)) {
       const configData = fs.readFileSync(configFilePath, "utf8");
       const config = JSON.parse(configData);
@@ -65,6 +89,8 @@ function loadWabbajackPath() {
         console.log("Saved Wabbajack path not found or invalid");
         return null;
       }
+    } else {
+      console.log("Config file not found");
     }
   } catch (error) {
     console.error(`Error loading Wabbajack path: ${error.message}`);

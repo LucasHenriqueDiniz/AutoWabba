@@ -36,7 +36,7 @@ async function performClick(browser, targetPage) {
       if (isVisible) {
         await page.evaluate(() => document.querySelector("button#slowDownloadButton")?.click());
         console.log("Botão de download principal clicado!");
-        return targetPage.url;
+        return { url: targetPage.url, clickedMain: true };
       }
     } catch (error) {
       console.log("Botão de download principal não disponível, tentando botão alternativo...");
@@ -50,7 +50,7 @@ async function performClick(browser, targetPage) {
       if (clickHereButton) {
         await clickHereButton.click();
         console.log("Botão 'click here' clicado!");
-        return targetPage.url;
+        return { url: targetPage.url, clickedMain: false };
       }
     } catch (error) {
       console.log("Botão 'click here' não encontrado, tentando seletor mais específico...");
@@ -66,7 +66,7 @@ async function performClick(browser, targetPage) {
         if (text && text.toLowerCase().includes("click here")) {
           await link.click();
           console.log("Botão 'click here' encontrado e clicado!");
-          return targetPage.url;
+          return { url: targetPage.url, clickedMain: false };
         }
       }
     } catch (error) {

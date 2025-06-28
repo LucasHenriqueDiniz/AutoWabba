@@ -38,6 +38,7 @@ const MAX_ATTEMPTS = 10;
 const COOLDOWN_TIME = 10000;
 let errorPageCount = 0;
 const MAX_ERROR_PAGES = 3;
+let downloadCounter = 0;
 
 /**
  * Create the main application window
@@ -69,9 +70,9 @@ function createWindow() {
 /**
  * Send status update to renderer
  */
-function sendStatusUpdate(status) {
+function sendStatusUpdate(status, extra = {}) {
   if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.send("status-update", status);
+    mainWindow.webContents.send("status-update", { status, ...extra });
   }
 }
 
@@ -118,9 +119,10 @@ async function waitForWabbajackToStart() {
 async function startDownloadAutomation() {
   isRunning = true;
   stopRequested = false;
+  downloadCounter = 0;
 
   console.log("Automation started");
-  sendStatusUpdate("running");
+  sendStatusUpdate("running", { downloadCounter });
 
   while (isRunning && !stopRequested) {
     try {
@@ -128,9 +130,17 @@ async function startDownloadAutomation() {
       const pages = await checkBrowserAvailability();
 
       if (!pages) {
+        // Browser not available - Wabbajack might not have opened a web page yet
+        // Just wait and continue, don't stop automation
+        console.log("Browser not available yet, waiting for Wabbajack to open a web page...");
+        sendStatusUpdate("waiting_browser", { downloadCounter });
         await sleep(2000);
         continue;
       }
+
+      // Browser is available - we have web pages to work with
+      console.log(`Browser available with ${pages.length} pages`);
+      sendStatusUpdate("running", { downloadCounter });
 
       // Check if there are many error pages
       if (errorPageCount >= MAX_ERROR_PAGES) {
@@ -170,11 +180,14 @@ async function startDownloadAutomation() {
         // Execute click
         const browser = await chromium.connectOverCDP("http://localhost:9222");
         const clickResult = await performClick(browser, targetPage);
-
-        if (clickResult) {
-          lastClickedUrl = clickResult;
+        if (clickResult && clickResult.url) {
+          lastClickedUrl = clickResult.url;
           attempts = 0;
           errorPageCount = 0;
+          if (clickResult.clickedMain) {
+            downloadCounter++;
+            sendStatusUpdate("running", { downloadCounter });
+          }
           console.log("Download started successfully");
           await browser.close();
           await sleep(COOLDOWN_TIME);
@@ -185,6 +198,8 @@ async function startDownloadAutomation() {
           await sleep(2000);
         }
       } else {
+        // No download page found - might be on a different page
+        console.log("No download page found, waiting...");
         await sleep(2000);
       }
     } catch (error) {
@@ -194,7 +209,7 @@ async function startDownloadAutomation() {
   }
 
   isRunning = false;
-  sendStatusUpdate("stopped");
+  sendStatusUpdate("stopped", { downloadCounter });
   console.log("Automation stopped");
 }
 
@@ -252,10 +267,11 @@ ipcMain.on("start-automation", async (event) => {
     // Check if Wabbajack is already running
     const wjRunning = await isWabbajackRunning();
     if (wjRunning) {
-      console.log("Wabbajack is already running");
-      sendStatusUpdate("wabbajack_running");
-      // Restart the continuous check
-      startWabbajackStatusCheck();
+      console.log("Wabbajack is already running, starting automation...");
+
+      // Start automation directly since Wabbajack is already running
+      // The automation will wait for browser to be available
+      await startDownloadAutomation();
       return;
     }
 
@@ -264,6 +280,7 @@ ipcMain.on("start-automation", async (event) => {
 
     if (!launched) {
       console.error("Failed to launch Wabbajack");
+      sendStatusUpdate("ready");
       return;
     }
 
@@ -273,19 +290,11 @@ ipcMain.on("start-automation", async (event) => {
     // Wait 3 seconds for stabilization
     await sleep(3000);
 
-    // Check browser connection
-    const pages = await checkBrowserAvailability();
-    if (!pages) {
-      console.error("Browser connection not available");
-      return;
-    }
-
-    sendBrowserStatus("available");
-
-    // Start automation
+    // Start automation - it will wait for browser to be available
     await startDownloadAutomation();
   } catch (error) {
     console.error("Error starting automation:", error.message);
+    sendStatusUpdate("ready");
   }
 });
 
@@ -390,8 +399,8 @@ async function checkWabbajackStatus() {
   try {
     const isRunning = await isWabbajackRunning();
     if (isRunning) {
-      sendStatusUpdate("wabbajack_running");
-      // Don't send browser status here, let the status update handle the UI
+      // Don't send status update when Wabbajack is running
+      // The automation should handle this
     } else {
       // Wabbajack was closed, enable start button
       sendStatusUpdate("ready");
