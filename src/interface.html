@@ -56,7 +56,7 @@
         color: white;
       }
       .container {
-        max-width: 600px;
+        max-width: 400px;
         margin: 0 auto;
         padding: 20px;
       }
@@ -74,13 +74,14 @@
         gap: 15px;
       }
       button {
-        padding: 10px 25px;
+        padding: 12px 30px;
         border: none;
         border-radius: 4px;
         cursor: pointer;
         font-weight: bold;
         transition: all 0.2s ease;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        font-size: 14px;
       }
       button:hover {
         transform: translateY(-2px);
@@ -108,83 +109,16 @@
         background-color: #f44336;
         color: white;
       }
-      .setup-btn {
-        background-color: #2196f3;
-        color: white;
-      }
-
-      .status {
-        text-align: center;
-        margin-bottom: 15px;
-        font-weight: bold;
-        padding: 5px;
-        border-radius: 4px;
-        background-color: #1a1a1a;
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
-      }
-      .log-container {
+      .status-bar {
         background-color: #1a1a1a;
         border: 1px solid #444;
-        padding: 12px;
-        height: 250px;
-        overflow-y: auto;
+        padding: 15px;
         border-radius: 6px;
-        box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.5);
-      }
-      .log-entry {
-        margin: 5px 0;
-        border-bottom: 1px dotted #444;
-        padding-bottom: 5px;
-        font-family: Consolas, monospace;
-        font-size: 13px;
-      }
-      .footer {
-        margin-top: 15px;
-        color: #888;
-        font-size: 12px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .footer-content {
-        display: flex;
-        gap: 10px;
-      }
-      .github-link {
-        display: inline-flex;
-        align-items: center;
-        color: #66aa66;
-        text-decoration: none;
-        gap: 5px;
-        padding: 5px 10px;
-        border-radius: 4px;
-        transition: all 0.2s ease;
-      }
-      .github-link:hover {
-        background-color: #333;
-      }
-      .github-icon {
-        width: 20px;
-        height: 20px;
-        fill: #66aa66;
-      }
-      .help-link {
-        display: inline-flex;
-        align-items: center;
-        color: #6688aa;
-        text-decoration: none;
-        gap: 5px;
-        padding: 5px 10px;
-        border-radius: 4px;
-        transition: all 0.2s ease;
-      }
-      .help-link:hover {
-        background-color: #333;
-      }
-      .help-icon {
-        width: 20px;
-        height: 20px;
-        fill: #6688aa;
+        margin: 20px 0;
+        text-align: center;
+        font-weight: bold;
+        font-size: 16px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
       }
       .wabbajack-path-container {
         display: flex;
@@ -220,62 +154,19 @@
       .edit-icon:hover {
         opacity: 1;
       }
-      /* Modal styles */
-      .modal {
-        position: fixed;
-        z-index: 100;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.7);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      .footer {
+        margin-top: 20px;
+        color: #888;
+        font-size: 12px;
+        text-align: center;
       }
-      .modal-content {
-        background-color: #2a2a2a;
-        margin: auto;
-        padding: 20px;
-        border: 1px solid #555;
-        border-radius: 8px;
-        width: 80%;
-        max-width: 500px;
-        max-height: 80vh;
-        overflow-y: auto;
-        position: relative;
-        color: #f0f0f0;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-      }
-      .modal-close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-      }
-      .modal-close:hover,
-      .modal-close:focus {
+      .github-link {
         color: #66aa66;
         text-decoration: none;
+        transition: all 0.2s ease;
       }
-      .modal-content h2 {
-        color: #66aa66;
-        margin-top: 0;
-        border-bottom: 1px solid #444;
-        padding-bottom: 10px;
-      }
-      .modal-content p {
-        margin: 12px 0;
-      }
-      .modal-content ul,
-      .modal-content ol {
-        margin-top: 5px;
-        margin-bottom: 15px;
-        padding-left: 25px;
-      }
-      .modal-content li {
-        margin-bottom: 8px;
+      .github-link:hover {
+        color: #88cc88;
       }
     </style>
   </head>
@@ -305,12 +196,15 @@
       </div>
     </div>
     <div class="container">
+      <h1>AutoWabba</h1>
+
       <div
-        class="status"
-        id="status"
+        class="status-bar"
+        id="statusBar"
       >
-        Status: Ready
+        Ready
       </div>
+
       <div class="controls">
         <button
           class="start-btn"
@@ -327,31 +221,8 @@
           Stop
         </button>
       </div>
-      <div
-        class="controls"
-        style="margin-top: 10px"
-      >
-        <button
-          class="setup-btn"
-          id="launchWabbajackBtn"
-          disabled
-        >
-          Launch with Debug
-        </button>
-      </div>
-      <div
-        class="wabbajack-path-container"
-        id="wabbajackPathContainer"
-      >
-        <svg
-          class="path-icon"
-          id="pathSavedIcon"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-          style="width: 18px; height: 18px; fill: #66aa66; margin-right: 8px; display: none"
-        >
-          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-        </svg>
+
+      <div class="wabbajack-path-container">
         <div
           class="wabbajack-path"
           id="wabbajackPath"
@@ -369,84 +240,43 @@
           />
         </svg>
       </div>
-      <h3>Activity Log:</h3>
-      <div
-        class="log-container"
-        id="logContainer"
-      ></div>
+
       <div class="footer">
-        <div class="footer-content">
-          <a
-            href="#"
-            class="help-link"
-            id="helpLink"
-          >
-            <svg
-              class="help-icon"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm1.25 17c0 .69-.559 1.25-1.25 1.25-.689 0-1.25-.56-1.25-1.25s.561-1.25 1.25-1.25c.691 0 1.25.56 1.25 1.25zm1.393-9.998c-.608-.616-1.515-.955-2.551-.955-2.18 0-3.59 1.55-3.59 3.95h2.011c0-1.486.829-2.013 1.538-2.013.634 0 1.307.421 1.364 1.226.062.847-.39 1.277-.962 1.821-1.412 1.343-1.438 1.993-1.432 3.468h2.005c-.013-.664.03-1.203.935-2.178.677-.73 1.519-1.638 1.536-3.022.011-.924-.284-1.719-.854-2.297z"
-              />
-            </svg>
-            Help?
-          </a>
-        </div>
-        <div class="footer-content">
-          <a
-            href="https://github.com/LucasHenriqueDiniz/AutoWabba"
-            class="github-link"
-            id="githubLink"
-          >
-            <svg
-              class="github-icon"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
-              />
-            </svg>
-            GitHub
-          </a>
-        </div>
+        <a
+          href="https://github.com/LucasHenriqueDiniz/AutoWabba"
+          class="github-link"
+          id="githubLink"
+        >
+          GitHub
+        </a>
       </div>
     </div>
+
     <script>
-      const { ipcRenderer, remote } = require("electron");
+      const { ipcRenderer } = require("electron");
       const minimizeBtn = document.getElementById("minimizeBtn");
       const closeBtn = document.getElementById("closeBtn");
       const startBtn = document.getElementById("startBtn");
       const stopBtn = document.getElementById("stopBtn");
-      const selectWabbajackBtn = document.getElementById("selectWabbajackBtn");
-      const launchWabbajackBtn = document.getElementById("launchWabbajackBtn");
-      const statusElem = document.getElementById("status");
-      const logContainer = document.getElementById("logContainer");
+      const statusBar = document.getElementById("statusBar");
       const githubLink = document.getElementById("githubLink");
+      const wabbajackPathDisplay = document.getElementById("wabbajackPath");
+      const editWabbajackPathBtn = document.getElementById("editWabbajackPath");
 
-      // Check browser status and setup when application starts
+      // Check browser status when application starts
       window.addEventListener("DOMContentLoaded", () => {
-        statusElem.textContent = "Status: Setting up...";
-        statusElem.style.color = "#ff9800";
+        statusBar.textContent = "Checking...";
+        statusBar.style.color = "#ff9800";
         startBtn.disabled = true;
         stopBtn.disabled = true;
-        addLogMessage("Starting automatic setup...");
-        ipcRenderer.send("auto-setup");
+        ipcRenderer.send("check-browser");
       });
-      function addLogMessage(message) {
-        const entry = document.createElement("div");
-        entry.className = "log-entry";
-        entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
-        logContainer.appendChild(entry);
-        logContainer.scrollTop = logContainer.scrollHeight;
-      }
 
       startBtn.addEventListener("click", () => {
         startBtn.disabled = true;
         stopBtn.disabled = false;
-        statusElem.textContent = "Status: Running";
-        statusElem.style.color = "#4CAF50";
+        statusBar.textContent = "Starting...";
+        statusBar.style.color = "#4CAF50";
         ipcRenderer.send("start-automation");
       });
 
@@ -454,109 +284,63 @@
         stopBtn.disabled = true;
         ipcRenderer.send("stop-automation");
       });
-      launchWabbajackBtn.addEventListener("click", () => {
-        addLogMessage("Starting Wabbajack with debug mode enabled...");
-        ipcRenderer.send("launch-wabbajack");
-        launchWabbajackBtn.disabled = true;
 
-        // Show a temporary status message
-        statusElem.textContent = "Status: Launching Wabbajack";
-        statusElem.style.color = "#ff9800"; // Orange
-
-        setTimeout(() => {
-          launchWabbajackBtn.disabled = false;
-        }, 10000); // Prevent multiple clicks
-      }); // Wabbajack path elements
-      const wabbajackPathContainer = document.getElementById("wabbajackPathContainer");
-      const wabbajackPathDisplay = document.getElementById("wabbajackPath");
-      const editWabbajackPathBtn = document.getElementById("editWabbajackPath");
-      // Event for the edit path button
       editWabbajackPathBtn.addEventListener("click", () => {
-        addLogMessage("Select Wabbajack executable location...");
         ipcRenderer.send("select-wabbajack");
       });
+
       // When Wabbajack is successfully selected
       ipcRenderer.on("wabbajack-selected", (event, wabbajackPath) => {
-        launchWabbajackBtn.disabled = false;
         wabbajackPathDisplay.textContent = wabbajackPath;
-        document.getElementById("pathSavedIcon").style.display = "block";
-        addLogMessage(`Wabbajack selected: ${wabbajackPath}`);
-        addLogMessage("Path saved. You can now launch Wabbajack with debug mode by clicking the 'Launch with Debug' button");
+        statusBar.textContent = "Wabbajack path selected";
+        statusBar.style.color = "#66aa66";
       });
 
-      ipcRenderer.on("log-message", (event, message) => {
-        addLogMessage(message);
-      });
       ipcRenderer.on("status-update", (event, status) => {
         if (status === "running") {
-          statusElem.textContent = "Status: Running";
-          statusElem.style.color = "#4CAF50";
+          statusBar.textContent = "Running - Automation active";
+          statusBar.style.color = "#4CAF50";
         } else if (status === "stopped") {
-          statusElem.textContent = "Status: Stopped";
-          statusElem.style.color = "#f44336";
+          statusBar.textContent = "Stopped";
+          statusBar.style.color = "#f44336";
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+        } else if (status === "wabbajack_running") {
+          statusBar.textContent = "Close Wabbajack before continuing, let the app open it";
+          statusBar.style.color = "#ff9800";
+          startBtn.disabled = true;
+          stopBtn.disabled = true;
+        } else if (status === "ready") {
+          statusBar.textContent = "Ready to start Wabbajack";
+          statusBar.style.color = "#66aa66";
           startBtn.disabled = false;
           stopBtn.disabled = true;
         }
       });
-      ipcRenderer.on("setup-complete", () => {
-        addLogMessage("Setup complete! Ready to start automation.");
-        statusElem.textContent = "Status: Ready";
-        statusElem.style.color = "#66aa66";
-        startBtn.disabled = false;
-      });
-      let previousBrowserStatus = null;
-      ipcRenderer.on("setup-status", (event, status, message) => {
-        statusElem.textContent = `Status: ${status}`;
-        if (status === "Setting up") {
-          statusElem.style.color = "#ff9800"; // Orange
-          startBtn.disabled = true;
-          stopBtn.disabled = true;
-        } else if (status === "Ready") {
-          statusElem.style.color = "#66aa66"; // Green
-          // Não habilitamos o botão Start automaticamente, isso será feito quando o browser for detectado
-          stopBtn.disabled = true;
-        } else if (status === "Error") {
-          statusElem.style.color = "#f44336"; // Red
-          startBtn.disabled = true;
-        }
 
-        if (message) {
-          addLogMessage(message);
-        }
-      });
       ipcRenderer.on("browser-status", (event, status) => {
-        // Only show log messages when the status changes
-        const statusChanged = status !== previousBrowserStatus;
-        previousBrowserStatus = status;
-
         if (status === "available") {
           startBtn.disabled = false;
-          statusElem.textContent = "Status: Ready for Automation";
-          statusElem.style.color = "#4CAF50";
-          if (statusChanged) {
-            addLogMessage("✅ Debug connection established with Wabbajack! Ready to start automation.");
-          }
+          statusBar.textContent = "Ready for automation";
+          statusBar.style.color = "#4CAF50";
         } else if (status === "unavailable") {
-          startBtn.disabled = true;
-          statusElem.textContent = "Status: Waiting for Wabbajack";
-          statusElem.style.color = "#ff9800"; // Orange for waiting status
-          if (statusChanged) {
-            // Check if we have a path selected
-            if (wabbajackPathDisplay.textContent.includes("No Wabbajack path selected")) {
-              addLogMessage("⚠️ Please select the Wabbajack executable first by clicking the edit icon.");
-            } else {
-              addLogMessage("⚠️ Wabbajack needs to be launched with debug mode. Click 'Launch with Debug' button.");
-            }
+          if (wabbajackPathDisplay.textContent.includes("No Wabbajack path selected")) {
+            startBtn.disabled = true;
+            statusBar.textContent = "Please select Wabbajack executable";
+            statusBar.style.color = "#ff9800";
+          } else {
+            startBtn.disabled = false;
+            statusBar.textContent = "Ready to start Wabbajack";
+            statusBar.style.color = "#66aa66";
           }
         } else if (status === "error") {
           startBtn.disabled = true;
-          statusElem.textContent = "Status: Connection Error";
-          statusElem.style.color = "#f44336";
-          if (statusChanged) {
-            addLogMessage("❌ Error connecting to Wabbajack debug interface. Check if port 9222 is available.");
-          }
+          statusBar.textContent = "Connection error";
+          statusBar.style.color = "#f44336";
         }
-      }); // Title bar button events
+      });
+
+      // Title bar button events
       minimizeBtn.addEventListener("click", () => {
         ipcRenderer.send("minimize-window");
       });
@@ -569,73 +353,7 @@
       githubLink.addEventListener("click", (event) => {
         event.preventDefault();
         ipcRenderer.send("open-github");
-      }); // Add event listener for the Help button
-      helpLink.addEventListener("click", () => {
-        showHelpDialog();
       });
-      function showHelpDialog() {
-        // Create modal elements
-        const modal = document.createElement("div");
-        modal.className = "modal";
-
-        const modalContent = document.createElement("div");
-        modalContent.className = "modal-content";
-
-        const closeBtn = document.createElement("span");
-        closeBtn.className = "modal-close";
-        closeBtn.innerHTML = "&times;";
-
-        const title = document.createElement("h2");
-        title.textContent = "AutoWabba Help";
-        const content = document.createElement("div");
-        content.innerHTML = `
-          <p><strong>What is AutoWabba?</strong></p>
-          <p>AutoWabba is a tool that helps automate downloads from Nexus Mods when using Wabbajack mod lists.</p>
-          
-          <p><strong>How to use:</strong></p>
-          <ol>
-            <li>Select the Wabbajack executable using the edit icon next to the path</li>
-            <li>Click the "Launch with Debug" button to start Wabbajack with debugging enabled</li>
-            <li>The "Start" button will be enabled once Wabbajack is detected</li>
-            <li>Click "Start" to begin the automation process</li>
-            <li>The tool will automatically click download buttons when prompted by Wabbajack</li>
-            <li>Click "Stop" when you're done or want to pause the automation</li>
-          </ol>
-            <p><strong>Troubleshooting:</strong></p>
-          <ul>
-            <li><strong>Login ou Problemas com CAPTCHA:</strong> Se o Wabbajack não lembrar do seu login ou o CAPTCHA falhar, feche tudo e reinicie o AutoWabba. Em seguida, use 'Launch with Debug' novamente. Sua sessão de login será preservada na nova pasta de dados persistente</li>
-            <li><strong>Connection Issues:</strong> If "Browser not found" persists, close Wabbajack and use the "Launch with Debug" button again</li>
-            <li><strong>Login Required:</strong> Make sure you're logged into your Nexus account in Wabbajack</li>
-            <li><strong>Downloads Stuck:</strong> AutoWabba will automatically retry downloads after 10 attempts</li>
-            <li><strong>Port Already In Use:</strong> If you see this message, close other Edge or WebView2 instances</li>
-            <li><strong>Path Not Found:</strong> If your Wabbajack path is no longer valid, click the edit icon to select it again</li>
-          </ul>
-
-          <p><strong>Technical Details:</strong></p>
-          <p>AutoWabba uses Chrome DevTools Protocol on port 9222 to connect to the Edge WebView2 instance that Wabbajack uses. 
-          The wrapper script configures environment variables needed for debugging without requiring system changes or administrator rights.</p>
-        `;
-
-        // Assemble modal
-        modalContent.appendChild(closeBtn);
-        modalContent.appendChild(title);
-        modalContent.appendChild(content);
-        modal.appendChild(modalContent);
-        document.body.appendChild(modal);
-
-        // Add close functionality
-        closeBtn.addEventListener("click", () => {
-          document.body.removeChild(modal);
-        });
-
-        window.addEventListener("click", (event) => {
-          if (event.target === modal) {
-            document.body.removeChild(modal);
-          }
-        });
-      } // Event handlers finished
-
-      addLogMessage("Application started");
     </script>
   </body>
 </html>

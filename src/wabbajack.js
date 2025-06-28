@@ -1,16 +1,10 @@
 const { exec } = require("child_process");
 const fs = require("fs");
 const path = require("path");
-const { dialog } = require("electron");
+const os = require("os");
 
-// Common locations where Wabbajack might be installed
-const possibleWabbajackPaths = [
-  path.join(process.env.LOCALAPPDATA, "Wabbajack", "Wabbajack.exe"),
-  path.join("C:", "Program Files", "Wabbajack", "Wabbajack.exe"),
-  path.join("C:", "Program Files (x86)", "Wabbajack", "Wabbajack.exe"),
-  path.join(process.env.USERPROFILE, "Downloads", "Wabbajack", "Wabbajack.exe"),
-  path.join(process.env.APPDATA, "Wabbajack", "Wabbajack.exe"),
-];
+// Configuration file to store the Wabbajack path
+const configFilePath = path.join(process.cwd(), "wabbajack-config.json");
 
 /**
  * Check if Wabbajack is running
@@ -18,85 +12,209 @@ const possibleWabbajackPaths = [
  */
 function isWabbajackRunning() {
   return new Promise((resolve) => {
-    exec('tasklist /fi "imagename eq Wabbajack.exe" /fo csv /nh', (error, stdout) => {
+    // Use a more robust approach that works in different shells
+    const command = process.platform === "win32" ? 'tasklist /FI "IMAGENAME eq Wabbajack.exe"' : "ps aux | grep Wabbajack";
+
+    exec(command, { shell: true }, (error, stdout) => {
       if (error) {
-        console.error(`Error checking if Wabbajack is running: ${error}`);
+        console.log(`Error checking if Wabbajack is running: ${error}`);
         resolve(false);
         return;
       }
 
-      resolve(stdout.includes("Wabbajack.exe"));
+      // Check if the output contains Wabbajack.exe
+      const isRunning = stdout.includes("Wabbajack.exe");
+      console.log(`Wabbajack running check: ${isRunning ? "YES" : "NO"}`);
+      console.log(`Command output: ${stdout.trim()}`);
+      resolve(isRunning);
     });
   });
 }
 
 /**
- * Launch Wabbajack
- * @returns {Promise<boolean>} True if launched successfully or already running
+ * Save the Wabbajack path to configuration file
+ * @param {string} wabbajackPath - Path to Wabbajack
  */
-async function launchWabbajack() {
+function saveWabbajackPath(wabbajackPath) {
   try {
-    // Verificar se o Wabbajack já está em execução
-    const isRunning = await isWabbajackRunning();
-    if (isRunning) {
-      console.log("Wabbajack is already running");
-      return true;
-    }
+    const config = {
+      wabbajackPath: wabbajackPath,
+      lastUpdated: new Date().toISOString(),
+    };
+    fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2));
+    console.log(`Wabbajack path saved: ${wabbajackPath}`);
+  } catch (error) {
+    console.error(`Error saving Wabbajack path: ${error.message}`);
+  }
+}
 
-    // Tenta encontrar o caminho do Wabbajack ou pedir ao usuário
-    let wabbajackPath;
-    try {
-      wabbajackPath = await findWabbajackPath();
-    } catch (error) {
-      console.log(`Error finding Wabbajack: ${error.message}`);
-      return false;
-    }
+/**
+ * Load the saved Wabbajack path
+ * @returns {string|null} Saved path or null if not found
+ */
+function loadWabbajackPath() {
+  try {
+    if (fs.existsSync(configFilePath)) {
+      const configData = fs.readFileSync(configFilePath, "utf8");
+      const config = JSON.parse(configData);
 
+      if (config.wabbajackPath && fs.existsSync(config.wabbajackPath)) {
+        console.log(`Wabbajack path loaded: ${config.wabbajackPath}`);
+        return config.wabbajackPath;
+      } else {
+        console.log("Saved Wabbajack path not found or invalid");
+        return null;
+      }
+    }
+  } catch (error) {
+    console.error(`Error loading Wabbajack path: ${error.message}`);
+  }
+  return null;
+}
+
+/**
+ * Get Wabbajack path (loaded or prompt user)
+ * @returns {Promise<string|null>} Wabbajack path or null if not available
+ */
+async function getWabbajackPath() {
+  // First, try to load saved path
+  let wabbajackPath = loadWabbajackPath();
+
+  if (wabbajackPath) {
+    return wabbajackPath;
+  }
+
+  // If no saved path, return null (user will select via dialog)
+  return null;
+}
+
+/**
+ * Creates a wrapper script to launch Wabbajack with debugging flag
+ * @param {string} wabbajackPath - Path to the Wabbajack executable
+ * @returns {Promise<string>} Path to the created script
+ */
+async function createWabbajackWrapper(wabbajackPath) {
+  // Validate path
+  if (!wabbajackPath || !fs.existsSync(wabbajackPath)) {
+    throw new Error(`Invalid Wabbajack path: ${wabbajackPath}`);
+  }
+
+  // Get the Wabbajack directory to place data files nearby
+  const wabbajackDir = path.dirname(wabbajackPath);
+
+  // Create a persistent directory for AutoWabba adjacent to Wabbajack
+  const appDataDir = path.join(wabbajackDir, "AutoWabba");
+  if (!fs.existsSync(appDataDir)) {
+    fs.mkdirSync(appDataDir, { recursive: true });
+  }
+
+  // Create persistent subdirectory for WebView2 data to save login info
+  const webview2DataDir = path.join(appDataDir, "webview2data");
+  if (!fs.existsSync(webview2DataDir)) {
+    fs.mkdirSync(webview2DataDir, { recursive: true });
+  }
+
+  // Create temporary directory for the script
+  const tempDir = path.join(os.tmpdir(), "autowabba");
+  if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+  }
+
+  // Path for the wrapper script with timestamp to avoid conflicts
+  const wrapperPath = path.join(tempDir, `launch_wabbajack_${Date.now()}.bat`);
+
+  // Script content with debug options for better compatibility
+  const scriptContent = `@echo off
+echo ======================================================
+echo  AutoWabba Launcher - Wabbajack Debug Edition
+echo ======================================================
+echo.
+
+rem Set environment variables to configure WebView2
+set WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=9222
+set WEBVIEW2_USER_DATA_FOLDER=${webview2DataDir.replace(/\\/g, "\\\\")}
+set WEBVIEW2_BROWSER_ARGS=--remote-debugging-port=9222
+
+echo WebView2 debugging settings:
+echo - Debug port: 9222
+echo - Data folder: %WEBVIEW2_USER_DATA_FOLDER%
+echo.
+echo [INFO] These settings allow AutoWabba to connect to
+echo        Wabbajack and automate Nexus Mods downloads.
+echo.
+echo Starting Wabbajack from: "${wabbajackPath}"
+echo Please wait while the application initializes...
+echo.
+echo [IMPORTANT] You can close this window after Wabbajack starts
+
+rem Create data folder if it doesn't exist
+if not exist "%WEBVIEW2_USER_DATA_FOLDER%" mkdir "%WEBVIEW2_USER_DATA_FOLDER%"
+
+rem Launch Wabbajack with the environment variables configured
+start "" "${wabbajackPath}"
+
+echo.
+echo [TIP] If you have login or CAPTCHA issues:
+echo 1. Close Wabbajack and AutoWabba
+echo 2. Restart AutoWabba and use 'Launch with Debug' again
+echo 3. Previous login should be preserved
+
+rem Wait a bit to ensure user can read the messages
+timeout /t 20 /nobreak >nul
+exit
+`;
+
+  // Write the script to file
+  fs.writeFileSync(wrapperPath, scriptContent);
+
+  return wrapperPath;
+}
+
+/**
+ * Launch Wabbajack with debug settings
+ * @param {string} wabbajackPath - Path to Wabbajack executable
+ * @returns {Promise<boolean>} True if launched successfully
+ */
+async function launchWabbajackWithDebug(wabbajackPath) {
+  try {
     if (!wabbajackPath) {
-      console.log("Wabbajack executable not found");
+      console.error("Wabbajack path not specified");
       return false;
     }
 
-    // Usa o launcher com debug flag em vez do método direto
-    const { launchWabbajackWithDebug } = require("./launcher");
-    const success = await launchWabbajackWithDebug(wabbajackPath);
+    console.log(`Preparing wrapper for Wabbajack: ${wabbajackPath}`);
+    const wrapperPath = await createWabbajackWrapper(wabbajackPath);
 
-    if (!success) {
-      console.log("Failed to launch Wabbajack with debug wrapper");
-      // Fallback para o método tradicional se o wrapper falhar
-      return new Promise((resolve) => {
-        exec(`start "" "${wabbajackPath}"`, (error) => {
-          if (error) {
-            console.log(`Could not auto-launch Wabbajack: ${error}`);
-            resolve(false);
-          } else {
-            console.log("Wabbajack launched with fallback method");
-            setTimeout(async () => {
-              const nowRunning = await isWabbajackRunning();
-              resolve(nowRunning);
-            }, 2000);
-          }
-        });
-      });
+    if (!wrapperPath) {
+      console.error("Failed to create wrapper for Wabbajack");
+      return false;
     }
 
-    console.log("Wabbajack launch initiated with debug wrapper");
+    console.log(`Executing wrapper from: ${wrapperPath}`);
 
-    // Verificar se o processo está realmente rodando após um tempo
     return new Promise((resolve) => {
-      setTimeout(async () => {
-        const nowRunning = await isWabbajackRunning();
-        resolve(nowRunning);
-      }, 3000);
+      // Execute wrapper in background to not block
+      const child = exec(`"${wrapperPath}"`, (error) => {
+        // This callback is only called when wrapper finishes (after 20s)
+        // But we don't need to wait for this
+      });
+
+      // Wait a bit for Wabbajack to start
+      setTimeout(() => {
+        console.log("Wrapper executed, Wabbajack should be starting...");
+        resolve(true);
+      }, 3000); // 3 seconds is enough for Wabbajack to start
     });
   } catch (error) {
-    console.log(`Error in launchWabbajack: ${error}`);
+    console.error(`Error in launcher: ${error}`);
     return false;
   }
 }
 
 module.exports = {
   isWabbajackRunning,
-  findWabbajackPath,
-  launchWabbajack,
+  getWabbajackPath,
+  saveWabbajackPath,
+  loadWabbajackPath,
+  launchWabbajackWithDebug,
 };
