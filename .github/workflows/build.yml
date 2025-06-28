@@ -33,27 +33,27 @@ jobs:
       - name: List build output
         run: dir dist
 
-      - name: Salvar certificado de assinatura via base64
-        run: |
-          [System.Convert]::FromBase64String("${{ secrets.CODESIGN_PFX }}") | Set-Content -Path codesign.pfx -AsByteStream
-        shell: pwsh
+      # - name: Salvar certificado de assinatura via base64
+      #   run: |
+      #     [System.Convert]::FromBase64String("${{ secrets.CODESIGN_PFX }}") | Set-Content -Path codesign.pfx -AsByteStream
+      #   shell: pwsh
 
-      - name: Verificar os primeiros bytes do PFX
-        run: |
-          $bytes = Get-Content codesign.pfx -AsByteStream -TotalCount 32
-          $bytes | ForEach-Object { Write-Host ('{0:X2}' -f $_) }
-        shell: pwsh
+      # - name: Verificar os primeiros bytes do PFX
+      #   run: |
+      #     $bytes = Get-Content codesign.pfx -AsByteStream -TotalCount 32
+      #     $bytes | ForEach-Object { Write-Host ('{0:X2}' -f $_) }
+      #   shell: pwsh
 
-      - name: Assinar executável com ação pronta
-        uses: markeytos/code-sign-action@v1
-        with:
-          certificate: ${{ secrets.CODESIGN_PFX }}
-          password: ${{ secrets.CODESIGN_PFX_PASSWORD }}
-          certificatesha1: ${{ secrets.CODESIGN_PFX_SHA1 }}
-          certificatename: ${{ secrets.CODESIGN_PFX_NAME }}
-          folder: "dist"
-          recursive: false
-          timestampUrl: "http://timestamp.digicert.com" # opcional pelo SDK por padrão :contentReference[oaicite:0]{index=0}
+      # - name: Assinar executável com ação pronta
+      #   uses: markeytos/code-sign-action@v1
+      #   with:
+      #     certificate: ${{ secrets.CODESIGN_PFX }}
+      #     password: ${{ secrets.CODESIGN_PFX_PASSWORD }}
+      #     certificatesha1: ${{ secrets.CODESIGN_PFX_SHA1 }}
+      #     certificatename: ${{ secrets.CODESIGN_PFX_NAME }}
+      #     folder: "dist"
+      #     recursive: false
+      #     timestampUrl: "http://timestamp.digicert.com" # opcional pelo SDK por padrão :contentReference[oaicite:0]{index=0}
 
       - name: Create Release and Upload Assets
         uses: softprops/action-gh-release@v1
