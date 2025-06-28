@@ -1,3 +1,5 @@
+![Banner](.github/assets/banner.jpg)
+
 # AutoWabba
 
 **Automatic Download Helper for Wabbajack**
@@ -5,6 +7,8 @@
 AutoWabba automates the process of downloading mods from Nexus Mods when using Wabbajack mod lists by automatically clicking download buttons.
 
 ## Features
+
+![App Showcase](.github/assets/app_showcase.png)
 
 - **Automatic Download Clicking**: Automatically clicks download buttons on Nexus Mods pages
 - **Error Recovery**: Detects and handles error pages and browser issues

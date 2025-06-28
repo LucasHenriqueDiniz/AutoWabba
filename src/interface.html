@@ -294,6 +294,9 @@
         wabbajackPathDisplay.textContent = wabbajackPath;
         statusBar.textContent = "Wabbajack path selected";
         statusBar.style.color = "#66aa66";
+        // Enable start button immediately when Wabbajack is selected
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
       });
 
       ipcRenderer.on("status-update", (event, status) => {
@@ -329,7 +332,8 @@
             statusBar.textContent = "Please select Wabbajack executable";
             statusBar.style.color = "#ff9800";
           } else {
-            startBtn.disabled = false;
+            // Don't disable start button if Wabbajack is already selected
+            // The button should remain enabled to allow launching Wabbajack
             statusBar.textContent = "Ready to start Wabbajack";
             statusBar.style.color = "#66aa66";
           }
