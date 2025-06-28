@@ -35,7 +35,7 @@ jobs:
 
       - name: Salvar certificado de assinatura
         run: |
-          [System.Convert]::FromBase64String("${{ secrets.CODESIGN_PFX }}") | Set-Content -Encoding Byte codesign.pfx
+          [System.Convert]::FromBase64String("${{ secrets.CODESIGN_PFX }}") | Set-Content -Path codesign.pfx -AsByteStream
         shell: pwsh
 
       - name: Assinar o executável
