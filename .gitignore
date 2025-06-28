@@ -43,3 +43,6 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+*4.0.2.0
+*4.0.1.0
+.wabbajack-cli.bat

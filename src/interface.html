@@ -112,6 +112,7 @@
         background-color: #2196f3;
         color: white;
       }
+
       .status {
         text-align: center;
         margin-bottom: 15px;
@@ -184,6 +185,40 @@
         width: 20px;
         height: 20px;
         fill: #6688aa;
+      }
+      .wabbajack-path-container {
+        display: flex;
+        align-items: center;
+        background-color: #1a1a1a;
+        padding: 10px 12px;
+        border-radius: 4px;
+        margin: 15px 0;
+        border: 1px solid #444;
+        overflow: hidden;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+      }
+      .wabbajack-path {
+        flex-grow: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #ddd;
+        font-family: Consolas, monospace;
+        font-size: 13px;
+        padding: 3px 0;
+      }
+      .edit-icon {
+        width: 18px;
+        height: 18px;
+        margin-left: 10px;
+        cursor: pointer;
+        fill: #66aa66;
+        opacity: 0.7;
+        flex-shrink: 0;
+        transition: opacity 0.2s ease;
+      }
+      .edit-icon:hover {
+        opacity: 1;
       }
       /* Modal styles */
       .modal {
@@ -278,12 +313,6 @@
       </div>
       <div class="controls">
         <button
-          class="setup-btn"
-          id="setupBtn"
-        >
-          Setup Browser
-        </button>
-        <button
           class="start-btn"
           id="startBtn"
           disabled
@@ -297,6 +326,48 @@
         >
           Stop
         </button>
+      </div>
+      <div
+        class="controls"
+        style="margin-top: 10px"
+      >
+        <button
+          class="setup-btn"
+          id="launchWabbajackBtn"
+          disabled
+        >
+          Launch with Debug
+        </button>
+      </div>
+      <div
+        class="wabbajack-path-container"
+        id="wabbajackPathContainer"
+      >
+        <svg
+          class="path-icon"
+          id="pathSavedIcon"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+          style="width: 18px; height: 18px; fill: #66aa66; margin-right: 8px; display: none"
+        >
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+        </svg>
+        <div
+          class="wabbajack-path"
+          id="wabbajackPath"
+        >
+          No Wabbajack path selected. Click the edit icon to select.
+        </div>
+        <svg
+          class="edit-icon"
+          id="editWabbajackPath"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+          />
+        </svg>
       </div>
       <h3>Activity Log:</h3>
       <div
@@ -344,19 +415,25 @@
     </div>
     <script>
       const { ipcRenderer, remote } = require("electron");
-
       const minimizeBtn = document.getElementById("minimizeBtn");
       const closeBtn = document.getElementById("closeBtn");
-      const setupBtn = document.getElementById("setupBtn");
       const startBtn = document.getElementById("startBtn");
       const stopBtn = document.getElementById("stopBtn");
+      const selectWabbajackBtn = document.getElementById("selectWabbajackBtn");
+      const launchWabbajackBtn = document.getElementById("launchWabbajackBtn");
       const statusElem = document.getElementById("status");
       const logContainer = document.getElementById("logContainer");
-      const githubLink = document.getElementById("githubLink"); // Check browser status when application starts
-      window.addEventListener("DOMContentLoaded", () => {
-        ipcRenderer.send("check-browser");
-      });
+      const githubLink = document.getElementById("githubLink");
 
+      // Check browser status and setup when application starts
+      window.addEventListener("DOMContentLoaded", () => {
+        statusElem.textContent = "Status: Setting up...";
+        statusElem.style.color = "#ff9800";
+        startBtn.disabled = true;
+        stopBtn.disabled = true;
+        addLogMessage("Starting automatic setup...");
+        ipcRenderer.send("auto-setup");
+      });
       function addLogMessage(message) {
         const entry = document.createElement("div");
         entry.className = "log-entry";
@@ -364,20 +441,47 @@
         logContainer.appendChild(entry);
         logContainer.scrollTop = logContainer.scrollHeight;
       }
-      setupBtn.addEventListener("click", () => {
-        addLogMessage("Setting up browser...");
-        ipcRenderer.send("setup-browser");
-      });
+
       startBtn.addEventListener("click", () => {
         startBtn.disabled = true;
-        setupBtn.disabled = true;
         stopBtn.disabled = false;
+        statusElem.textContent = "Status: Running";
+        statusElem.style.color = "#4CAF50";
         ipcRenderer.send("start-automation");
       });
 
       stopBtn.addEventListener("click", () => {
         stopBtn.disabled = true;
         ipcRenderer.send("stop-automation");
+      });
+      launchWabbajackBtn.addEventListener("click", () => {
+        addLogMessage("Starting Wabbajack with debug mode enabled...");
+        ipcRenderer.send("launch-wabbajack");
+        launchWabbajackBtn.disabled = true;
+
+        // Show a temporary status message
+        statusElem.textContent = "Status: Launching Wabbajack";
+        statusElem.style.color = "#ff9800"; // Orange
+
+        setTimeout(() => {
+          launchWabbajackBtn.disabled = false;
+        }, 10000); // Prevent multiple clicks
+      }); // Wabbajack path elements
+      const wabbajackPathContainer = document.getElementById("wabbajackPathContainer");
+      const wabbajackPathDisplay = document.getElementById("wabbajackPath");
+      const editWabbajackPathBtn = document.getElementById("editWabbajackPath");
+      // Event for the edit path button
+      editWabbajackPathBtn.addEventListener("click", () => {
+        addLogMessage("Select Wabbajack executable location...");
+        ipcRenderer.send("select-wabbajack");
+      });
+      // When Wabbajack is successfully selected
+      ipcRenderer.on("wabbajack-selected", (event, wabbajackPath) => {
+        launchWabbajackBtn.disabled = false;
+        wabbajackPathDisplay.textContent = wabbajackPath;
+        document.getElementById("pathSavedIcon").style.display = "block";
+        addLogMessage(`Wabbajack selected: ${wabbajackPath}`);
+        addLogMessage("Path saved. You can now launch Wabbajack with debug mode by clicking the 'Launch with Debug' button");
       });
 
       ipcRenderer.on("log-message", (event, message) => {
@@ -391,19 +495,35 @@
           statusElem.textContent = "Status: Stopped";
           statusElem.style.color = "#f44336";
           startBtn.disabled = false;
-          setupBtn.disabled = false;
           stopBtn.disabled = true;
         }
       });
       ipcRenderer.on("setup-complete", () => {
-        addLogMessage("Browser setup complete! You can now open Wabbajack and start the automation.");
-        // Check again if browser is available
-        setTimeout(() => {
-          ipcRenderer.send("check-browser");
-        }, 1000);
+        addLogMessage("Setup complete! Ready to start automation.");
+        statusElem.textContent = "Status: Ready";
+        statusElem.style.color = "#66aa66";
+        startBtn.disabled = false;
       });
-
       let previousBrowserStatus = null;
+      ipcRenderer.on("setup-status", (event, status, message) => {
+        statusElem.textContent = `Status: ${status}`;
+        if (status === "Setting up") {
+          statusElem.style.color = "#ff9800"; // Orange
+          startBtn.disabled = true;
+          stopBtn.disabled = true;
+        } else if (status === "Ready") {
+          statusElem.style.color = "#66aa66"; // Green
+          // Não habilitamos o botão Start automaticamente, isso será feito quando o browser for detectado
+          stopBtn.disabled = true;
+        } else if (status === "Error") {
+          statusElem.style.color = "#f44336"; // Red
+          startBtn.disabled = true;
+        }
+
+        if (message) {
+          addLogMessage(message);
+        }
+      });
       ipcRenderer.on("browser-status", (event, status) => {
         // Only show log messages when the status changes
         const statusChanged = status !== previousBrowserStatus;
@@ -411,16 +531,30 @@
 
         if (status === "available") {
           startBtn.disabled = false;
+          statusElem.textContent = "Status: Ready for Automation";
+          statusElem.style.color = "#4CAF50";
           if (statusChanged) {
-            addLogMessage("Wabbajack detected! Ready to start.");
+            addLogMessage("✅ Debug connection established with Wabbajack! Ready to start automation.");
           }
         } else if (status === "unavailable") {
           startBtn.disabled = true;
+          statusElem.textContent = "Status: Waiting for Wabbajack";
+          statusElem.style.color = "#ff9800"; // Orange for waiting status
           if (statusChanged) {
-            addLogMessage("Wabbajack not found. Set up the browser and open Wabbajack.");
+            // Check if we have a path selected
+            if (wabbajackPathDisplay.textContent.includes("No Wabbajack path selected")) {
+              addLogMessage("⚠️ Please select the Wabbajack executable first by clicking the edit icon.");
+            } else {
+              addLogMessage("⚠️ Wabbajack needs to be launched with debug mode. Click 'Launch with Debug' button.");
+            }
           }
         } else if (status === "error") {
           startBtn.disabled = true;
+          statusElem.textContent = "Status: Connection Error";
+          statusElem.style.color = "#f44336";
+          if (statusChanged) {
+            addLogMessage("❌ Error connecting to Wabbajack debug interface. Check if port 9222 is available.");
+          }
         }
       }); // Title bar button events
       minimizeBtn.addEventListener("click", () => {
@@ -439,7 +573,6 @@
       helpLink.addEventListener("click", () => {
         showHelpDialog();
       });
-
       function showHelpDialog() {
         // Create modal elements
         const modal = document.createElement("div");
@@ -454,7 +587,6 @@
 
         const title = document.createElement("h2");
         title.textContent = "AutoWabba Help";
-
         const content = document.createElement("div");
         content.innerHTML = `
           <p><strong>What is AutoWabba?</strong></p>
@@ -462,19 +594,26 @@
           
           <p><strong>How to use:</strong></p>
           <ol>
-            <li>Click "Setup Browser" to prepare your browser for automation</li>
-            <li>Open Wabbajack and start installing your mod list</li>
-            <li>Click "Start" to begin the automation</li>
-            <li>The tool will automatically download files when prompted by Wabbajack</li>
-            <li>Click "Stop" when you're done</li>
+            <li>Select the Wabbajack executable using the edit icon next to the path</li>
+            <li>Click the "Launch with Debug" button to start Wabbajack with debugging enabled</li>
+            <li>The "Start" button will be enabled once Wabbajack is detected</li>
+            <li>Click "Start" to begin the automation process</li>
+            <li>The tool will automatically click download buttons when prompted by Wabbajack</li>
+            <li>Click "Stop" when you're done or want to pause the automation</li>
           </ol>
-          
-          <p><strong>Troubleshooting:</strong></p>
+            <p><strong>Troubleshooting:</strong></p>
           <ul>
-            <li>If the automation doesn't start, make sure Wabbajack is open</li>
-            <li>Try running "Setup Browser" again if downloads aren't being recognized</li>
-            <li>Make sure you're logged into your Nexus account in the browser</li>
+            <li><strong>Login ou Problemas com CAPTCHA:</strong> Se o Wabbajack não lembrar do seu login ou o CAPTCHA falhar, feche tudo e reinicie o AutoWabba. Em seguida, use 'Launch with Debug' novamente. Sua sessão de login será preservada na nova pasta de dados persistente</li>
+            <li><strong>Connection Issues:</strong> If "Browser not found" persists, close Wabbajack and use the "Launch with Debug" button again</li>
+            <li><strong>Login Required:</strong> Make sure you're logged into your Nexus account in Wabbajack</li>
+            <li><strong>Downloads Stuck:</strong> AutoWabba will automatically retry downloads after 10 attempts</li>
+            <li><strong>Port Already In Use:</strong> If you see this message, close other Edge or WebView2 instances</li>
+            <li><strong>Path Not Found:</strong> If your Wabbajack path is no longer valid, click the edit icon to select it again</li>
           </ul>
+
+          <p><strong>Technical Details:</strong></p>
+          <p>AutoWabba uses Chrome DevTools Protocol on port 9222 to connect to the Edge WebView2 instance that Wabbajack uses. 
+          The wrapper script configures environment variables needed for debugging without requiring system changes or administrator rights.</p>
         `;
 
         // Assemble modal
@@ -494,7 +633,7 @@
             document.body.removeChild(modal);
           }
         });
-      }
+      } // Event handlers finished
 
       addLogMessage("Application started");
     </script>
