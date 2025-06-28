@@ -1,6 +1,6 @@
 {
   "name": "auto-wabba",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Automatic downloader for Wabbajack mod lists from Nexus Mods",
   "main": "main.js",
   "author": "Lucas Henrique Diniz",
