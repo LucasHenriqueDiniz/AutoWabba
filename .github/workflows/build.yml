@@ -6,7 +6,7 @@ on:
       - "v*"
 
 permissions:
-  contents: write # Explicit permission to create releases
+  contents: write
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # Required for full tag history
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -33,19 +33,27 @@ jobs:
       - name: List build output
         run: dir dist
 
-      - name: Salvar certificado de assinatura
+      - name: Salvar certificado de assinatura via base64
         run: |
           [System.Convert]::FromBase64String("${{ secrets.CODESIGN_PFX }}") | Set-Content -Path codesign.pfx -AsByteStream
         shell: pwsh
 
-      - name: Assinar o executável
+      - name: Verificar os primeiros bytes do PFX
         run: |
-          "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22000.0\x64\signtool.exe" sign /f codesign.pfx /p "${{ secrets.CODESIGN_PFX_PASSWORD }}" /tr http://timestamp.digicert.com /td sha256 /fd sha256 ./dist/AutoWabba.exe
-        shell: cmd
+          $bytes = Get-Content codesign.pfx -AsByteStream -TotalCount 32
+          $bytes | ForEach-Object { Write-Host ('{0:X2}' -f $_) }
+        shell: pwsh
 
-      - name: Verificar certificado decodificado
-        run: |
-          head -c 32 codesign.pfx | hexdump -C
+      - name: Assinar executável com ação pronta
+        uses: markeytos/code-sign-action@v1
+        with:
+          certificate: ${{ secrets.CODESIGN_PFX }}
+          password: ${{ secrets.CODESIGN_PFX_PASSWORD }}
+          certificatesha1: ${{ secrets.CODESIGN_PFX_SHA1 }}
+          certificatename: ${{ secrets.CODESIGN_PFX_NAME }}
+          folder: "dist"
+          recursive: false
+          timestampUrl: "http://timestamp.digicert.com" # opcional pelo SDK por padrão :contentReference[oaicite:0]{index=0}
 
       - name: Create Release and Upload Assets
         uses: softprops/action-gh-release@v1
